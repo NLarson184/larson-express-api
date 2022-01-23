@@ -23,14 +23,4 @@ router.post(
 /* POST login info */
 router.post('/signin', controller.signin);
 
-/* GET user test for content */
-router.get('/test/user', function (req, res, next) {
-    // TODO: user content test logic
-});
-
-/* GET admin test for content */
-router.get('/test/admin', function (req, res, next) {
-    // TODO: admin content test logic
-});
-
 module.exports = router;
