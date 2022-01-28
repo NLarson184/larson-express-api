@@ -27,7 +27,8 @@ db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`
 
 // Define the CORS rules
 var corsOptions = {
-    origin: "http://localhost:4200"
+    origin: "http://localhost:4200",
+    
 };
 app.use(cors(corsOptions));
 
@@ -42,6 +43,7 @@ app.use(cookieParser())
 // Define our routes
 app.use('/api/v1/users', users);
 app.use('/api/v1/auth', auth);
+app.use('/api/v1/calendar', )
 
 module.exports = app;
 
@@ -49,7 +51,7 @@ app.listen(port, () => {
     console.log(`Larson Server api listening at http://localhost:${port}`)
 });
 
-// Seed the role DB if nothing exists
+// Seed the DB if nothing exists
 function initial() {
     Role.estimatedDocumentCount((err, count) => {
         if (!err && count === 0) {
