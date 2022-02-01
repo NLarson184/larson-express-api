@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 
 var users = require('./routes/users.routes');
 var auth = require('./routes/auth.routes');
+var calendar = require('./routes/calendar.routes');
 
 var app = express();
 const port = 3000;
@@ -28,7 +29,7 @@ db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`
 // Define the CORS rules
 var corsOptions = {
     origin: "http://localhost:4200",
-    
+
 };
 app.use(cors(corsOptions));
 
@@ -43,7 +44,7 @@ app.use(cookieParser())
 // Define our routes
 app.use('/api/v1/users', users);
 app.use('/api/v1/auth', auth);
-app.use('/api/v1/calendar', )
+app.use('/api/v1/calendar', calendar);
 
 module.exports = app;
 

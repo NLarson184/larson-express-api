@@ -5,6 +5,7 @@ const Event = db.event;
 
 var jwt = require("jsonwebtoken");
 const Role = require("../models/role.model");
+const moment = require("moment");
 
 // Create an event based on the given information
 exports.addEvent = (req, res) => {
@@ -24,7 +25,7 @@ exports.addEvent = (req, res) => {
             name: req.body.name,
             dateTime: req.body.dateTime,
             creator: user._id,
-            calendarList: req.body.calendarList.map(c => c._id),
+            calendarList: req.body.calendarList,
             notes: req.body.notes
         });
 
@@ -69,6 +70,39 @@ exports.AddCalendar = (req, res) => {
     })
 }
 
+// Get details for a specific event
+exports.getEvent = (req, res) => {
+    User.findById(req.userId).exec((err, user) => {
+        if (err) {
+            return res.status(500).send({ message: err });
+        }
+        if (!user) {
+            return res.status(404).send({ message: 'User not found.' });
+        }
+
+        Event.findById(req.params.id)
+            .populate("creator", "-__v")
+            .populate("calendarList", "-__v")
+            .exec((err, event) => {
+                if (err) {
+                    return res.status(500).send({ message: err });
+                }
+                if (!event) {
+                    return res.status(404).send({ message: 'Event not found.' });
+                }
+
+                return res.status(200).send({
+                    _id: event._id,
+                    name: event.name,
+                    dateTime: event.dateTime,
+                    creator: event.creator.email,
+                    calendarList: event.calendarList,
+                    notes: event.notes
+                });
+            })
+    })
+}
+
 // Get a list of events that this user has access to
 exports.getEventList = (req, res) => {
     User.findById(req.userId).exec((err, user) => {
@@ -91,9 +125,20 @@ exports.getEventList = (req, res) => {
                 return res.status(404).send({ messgae: "No calendars found." });
             }
 
-            // Find all the events that are mapped to any of these calendars
+            // Build out the search parameters
             var calendarIdList = calendars.map(c => c._id);
-            Event.find({ calendarList: { $in: calendarIdList } })
+            var eventListQuery = {
+                calendarList: { $in: calendarIdList }
+            }
+            if (req.query.month && req.query.year) {
+                // Get the date object for this month
+                let startMonth = moment([req.query.year, req.query.month]);
+                let endMonth = moment(startMonth).endOf('month');
+                eventListQuery.dateTime = { $gte: startMonth.toDate(), $lte: endMonth.toDate() };
+            }
+
+            // Find all the events that are mapped to any of these calendars
+            Event.find(eventListQuery)
                 .populate("calendarList", "-__v")
                 .exec((err, events) => {
                     if (err) {
@@ -125,7 +170,7 @@ exports.getEventList = (req, res) => {
                             name: currEvent.name,
                             dateTime: currEvent.dateTime,
                             creator: currEvent.creator,
-                            calendarList: calendarList
+                            calendarList: currEvent.calendarList.map(c => c._id)
                         });
                     }
 
@@ -145,8 +190,8 @@ exports.getCalendarList = (req, res) => {
             return res.status(404).send({ message: "User not found." });
         }
 
-        Calendar.find({ accessList: user_id })
-            .populate("accessList", "-__v")
+        Calendar.find({ owner: user._id })
+            .populate("owner", "-__v")
             .exec((err, calendars) => {
                 if (err) {
                     return res.status(500).send({ message: err });
@@ -183,7 +228,7 @@ exports.removeEvent = (req, res) => {
         }
 
         // Find the event that maps to the given id
-        Event.findById(req.eventId).exec((err, event) => {
+        Event.findById(req.params.id).exec((err, event) => {
             if (err) {
                 return res.status(500).send({ message: err });
             }
@@ -192,8 +237,8 @@ exports.removeEvent = (req, res) => {
             }
 
             // Verify that this user is the owner of the event
-            if (event.creator !== user._id) {
-                return res.status(401).send({ message: "Only the event creator can delete an event." });
+            if (event.creator.toString() != user._id.toString()) {
+                return res.status(401).send({ message: "Only the event creator can delete an event." + typeof(event.creator) + ' ' + typeof(user._id) });
             }
 
             // Remove the event from the database
@@ -218,7 +263,7 @@ exports.removeCalendar = (req, res) => {
         }
 
         // Find the calendar that matches the given id
-        Calendar.findById(req.calendarId).exec((err, calendar) => {
+        Calendar.findById(req.params.id).exec((err, calendar) => {
             if (err) {
                 return res.status(500).send({ message: err });
             }
@@ -251,7 +296,11 @@ exports.removeCalendar = (req, res) => {
                         // Splice this element from the list, if it's found
                         currEvent.calendarList.splice(indexToRemove, 1);
                         if (indexToRemove >= 0) {
-                            let res = await Event.updateOne({ id: currEvent._id }, { calendarList: currEvent.calendarList })
+                            Event.updateOne({ id: currEvent._id }, { calendarList: currEvent.calendarList }).exec((err, res) => {
+                                if (err) {
+                                    return res.status(500).send({ message: err });
+                                }
+                            })
                         }
                     }
                 }

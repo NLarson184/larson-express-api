@@ -10,7 +10,7 @@ Authentication logic was implemented based on bezcoder's article: https://www.be
 - MongoDB
 
 ## Calendar Service
-This project was designed to allow users of the Larson server to share calendar events with each other.  All necessary actions are performed through the calendar section of the website.  The calendar section of the website is only accessible by authenticated users.  The goal is to allow for calendar sharing with third-party devices, to allow for a RaspberryPI driven device to read and display calendar information.
+This project was designed to allow users of the Larson server to create and share calendar events with each other.  All necessary actions are performed through the calendar section of the website.  The calendar section of the website is only accessible by authenticated users.  The goal is to connect a third-party device that can display calendar events that are shared with it.
 
 ### Project Tech Stack
 - Angular

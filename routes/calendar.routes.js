@@ -18,7 +18,28 @@ router.get(
     "/eventList",
     [authJwt.verifyToken],
     controller.getEventList
+);
+
+// Get details for a specific event
+router.get(
+    "/event/:id",
+    [authJwt.verifyToken],
+    controller.getEvent
 )
+
+// Get a list of calendars for a given user
+router.get(
+    "/list",
+    [authJwt.verifyToken],
+    controller.getCalendarList
+)
+
+// Create a new calendar
+router.post(
+    "/",
+    [authJwt.verifyToken],
+    controller.AddCalendar
+);
 
 // Create a new event
 router.post(
@@ -26,3 +47,22 @@ router.post(
     [authJwt.verifyToken],
     controller.addEvent
 );
+
+// Delete an existing event
+router.delete(
+    "/event/:id",
+    [authJwt.verifyToken],
+    controller.removeEvent
+);
+
+// Delete an existing calendar
+router.delete(
+    "/:id",
+    [authJwt.verifyToken],
+    controller.removeCalendar
+)
+
+// TODO: Update event
+// TODO: Update calendar
+
+module.exports = router;
