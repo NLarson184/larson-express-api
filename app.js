@@ -8,7 +8,7 @@ var auth = require('./routes/auth.routes');
 var calendar = require('./routes/calendar.routes');
 
 var env = process.env.NODE_ENV || 'development';
-var dbConfig = require('./config/db.config')[env];
+
 
 var app = express();
 const port = 3000;
@@ -17,17 +17,31 @@ const port = 3000;
 const db = require("./models");
 // const dbConfig = require("./config/db.config");
 const Role = db.role;
+if (process.env.NODE_ENV !== 'production') {
+    var dbConfig = require('./config/db.config')[env];
+    db.mongoose.connect(dbConfig.database.URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }).then(() => {
+        console.log(`Successfully connected to MongoDb using ${env} config`);
+        initial();
+    }).catch(err => {
+        console.error("Connection Error", err);
+        process.exit();
+    });
+} else {
+    db.mongoose.connect(process.env.DB_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }).then(() => {
+        console.log(`Successfully connected to MongoDb using ${env} config`);
+        initial();
+    }).catch(err => {
+        console.error("Connection Error", err);
+        process.exit();
+    });
+}
 
-db.mongoose.connect(dbConfig.database.URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log(`Successfully connected to MongoDb using ${env} config`);
-    initial();
-}).catch(err => {
-    console.error("Connection Error", err);
-    process.exit();
-});
 
 // Define the CORS rules
 var corsOptions = {
