@@ -1,8 +1,15 @@
 const jwt = require("jsonwebtoken");
-const config = require("../config/auth.config");
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
+
+const authSecret;
+if(process.env.NODE_ENV !== 'production') {
+    const config = require("../config/auth.config");
+    authSecret = config.secret;
+} else {
+    authSecret = process.env.AUTH_SECRET;
+}
 
 // Verify that the given token both exists and is valid (based on secret token)
 verifyToken = (req, res, next) => {
@@ -12,7 +19,7 @@ verifyToken = (req, res, next) => {
         return res.status(403).send({ message: "No token provided." });
     }
 
-    jwt.verify(token, config.secret, (err, decoded) => {
+    jwt.verify(token, authSecret, (err, decoded) => {
         if (err) {
             return res.status(401).send({ message: "Unauthorized." });
         }

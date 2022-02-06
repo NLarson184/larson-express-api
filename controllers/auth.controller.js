@@ -99,7 +99,7 @@ exports.signin = (req, res) => {
             }
 
             // Generate an auth token that lasts 24 hours
-            var token = jwt.sign({ id: user.id }, config.secret, {
+            var token = jwt.sign({ id: user.id }, authSecret, {
                 expiresIn: 86400
             });
 
