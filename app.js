@@ -59,9 +59,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 
 // Define our routes
-app.use('/api/v1/users', users);
-app.use('/api/v1/auth', auth);
-app.use('/api/v1/calendar', calendar);
+app.use('/v1/users', users);
+app.use('/v1/auth', auth);
+app.use('/v1/calendar', calendar);
 
 // Serve the public folder statically
 app.use(express.static('public'));
