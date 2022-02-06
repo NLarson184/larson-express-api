@@ -7,19 +7,22 @@ var users = require('./routes/users.routes');
 var auth = require('./routes/auth.routes');
 var calendar = require('./routes/calendar.routes');
 
+var env = process.env.NODE_ENV || 'development';
+var dbConfig = require('./config/db.config')[env];
+
 var app = express();
 const port = 3000;
 
 // Connect to MongoDB instance
 const db = require("./models");
-const dbConfig = require("./config/db.config");
+// const dbConfig = require("./config/db.config");
 const Role = db.role;
 
-db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
+db.mongoose.connect(dbConfig.database.URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
-    console.log("Successfully connected to MongoDb");
+    console.log(`Successfully connected to MongoDb using ${env} config`);
     initial();
 }).catch(err => {
     console.error("Connection Error", err);
@@ -28,7 +31,7 @@ db.mongoose.connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`
 
 // Define the CORS rules
 var corsOptions = {
-    origin: "http://localhost:4200",
+    origin: "http://localhost:4200,https://api.nicklarson.me"
 
 };
 app.use(cors(corsOptions));
@@ -51,9 +54,9 @@ app.use(express.static('public'));
 
 module.exports = app;
 
-app.listen(port, () => {
-    console.log(`Larson Server api listening at http://localhost:${port}`)
-});
+// app.listen(port, () => {
+//     console.log(`Larson Server api listening at http://localhost:${port}`)
+// });
 
 // Seed the DB if nothing exists
 function initial() {
