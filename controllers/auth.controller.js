@@ -1,7 +1,14 @@
-const config = require("../config/auth.config");
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
+
+const authSecret;
+if(process.env.NODE_ENV !== 'production') {
+    const config = require("../config/auth.config");
+    authSecret = config.secret;
+} else {
+    authSecret = process.env.AUTH_SECRET;
+}
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");

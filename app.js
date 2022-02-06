@@ -17,7 +17,7 @@ const port = 3000;
 const db = require("./models");
 // const dbConfig = require("./config/db.config");
 const Role = db.role;
-if (process.env.NODE_ENV !== 'production') {
+if (env !== 'production') {
     var dbConfig = require('./config/db.config')[env];
     db.mongoose.connect(dbConfig.database.URL, {
         useNewUrlParser: true,
