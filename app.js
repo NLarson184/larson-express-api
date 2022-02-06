@@ -46,6 +46,9 @@ app.use('/api/v1/users', users);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/calendar', calendar);
 
+// Serve the public folder statically
+app.use(express.static('public'));
+
 module.exports = app;
 
 app.listen(port, () => {
