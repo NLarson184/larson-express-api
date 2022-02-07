@@ -45,10 +45,9 @@ if (env !== 'production') {
 
 // Define the CORS rules
 var corsOptions = {
-    origin: "http://localhost:4200,https://api.nicklarson.me,http://api.nicklarson.me"
-
+    origin: "http://localhost:4200,https://api.nicklarson.me"
 };
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 // Parse application/json requests
 app.use(express.json());
